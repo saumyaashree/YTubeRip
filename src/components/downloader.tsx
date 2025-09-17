@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect, useTransition, useCallback } from "react";
 import Image from "next/image";
 import {
   Clapperboard,
@@ -76,6 +76,21 @@ export function Downloader() {
   const { toast } = useToast();
   const thumbnailPlaceholder = PlaceHolderImages.find(p => p.id === 'yt-thumbnail-1');
 
+  const handleSaveFile = useCallback(() => {
+    if (!videoDetails) return;
+
+    const fileName = `${videoDetails.title}.${selectedFormat}`;
+    const dummyContent = `This is a dummy file for ${videoDetails.title} in ${selectedFormat} format.`;
+    const blob = new Blob([dummyContent], { type: "text/plain" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+  }, [videoDetails, selectedFormat]);
+
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isDownloading) {
@@ -83,6 +98,7 @@ export function Downloader() {
         setProgress((prev) => {
           if (prev >= 100) {
             clearInterval(interval);
+            handleSaveFile();
             return 100;
           }
           return prev + 1;
@@ -90,7 +106,7 @@ export function Downloader() {
       }, 50);
     }
     return () => clearInterval(interval);
-  }, [isDownloading]);
+  }, [isDownloading, handleSaveFile]);
 
   const handleFetchVideo = (e: React.FormEvent) => {
     e.preventDefault();
