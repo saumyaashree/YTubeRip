@@ -120,7 +120,7 @@ export function Downloader() {
   };
 
   const handleDownload = async () => {
-    const availableFormats = ["webm", "mp3"]; // Mock available formats
+    const availableFormats = ["mp4", "webm", "mp3"]; // Mock available formats
 
     if (availableFormats.includes(selectedFormat)) {
       startSimulatedDownload(selectedFormat);
